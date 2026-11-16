@@ -25,3 +25,4 @@ You can expect an acknowledgement within **48 hours** and a resolution plan with
 - API endpoints apply in-memory rate limiting per client IP.
 - All user input is validated and sanitised server-side before it is stored or returned.
 - The `.tidewise-data.json` runtime store is excluded from version control via `.gitignore`.
+

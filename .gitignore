@@ -4,5 +4,33 @@ dist/
 coverage/
 .DS_Store
 *.log
-.env*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── Secrets & environment files ─────────────────────────────────────────────
+# Never commit any .env file (except the safe example template)
+.env
+.env.*
 !.env.example
+
+# Private keys, certificates, and credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+secrets/
+credentials/
+
+# ── Runtime data files ───────────────────────────────────────────────────────
+# Local JSON store written by the API server (contains user-submitted data)
+.tidewise-data.json
+
+# ── OS / editor artefacts ────────────────────────────────────────────────────
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo

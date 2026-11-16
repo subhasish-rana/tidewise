@@ -63,7 +63,7 @@ export function HomeDashboard({
               Good morning, {firstName}
             </h1>
             <p className="text-sm sm:text-base text-slate-200 leading-relaxed">
-              Spot litter along Puri, Chandipur, or Bhubaneswar lakes? Snap a photo to verify waste type with AI and route municipal pickup.
+              Spot litter along Puri, Chandipur, or Bhubaneswar lakes? Snap a photo to tag the waste type and route municipal pickup.
             </p>
           </div>
 

@@ -1,6 +1,0 @@
-{
-  "name": "Tidewise",
-  "description": "Clean tides. Smarter communities. Community waste reporting, AI classification, and municipal cleanup routing across Odisha's beaches and urban lakes.",
-  "requestFramePermissions": ["geolocation"],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}

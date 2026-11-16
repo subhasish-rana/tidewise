@@ -76,11 +76,6 @@ export function ReportDetailView({
                 </div>
               )}
             </div>
-
-            <div className="text-xs text-[#52677A] pt-1">
-              <span className="font-semibold text-[#0B253A]">AI check:</span> Suggested{' '}
-              {report.aiSuggestedCategory} ({report.aiConfidence}% confidence) — {report.aiReasoning}
-            </div>
           </div>
         </div>
       </div>

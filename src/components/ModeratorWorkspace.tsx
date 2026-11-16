@@ -93,7 +93,7 @@ export function ModeratorWorkspace({
             Waste Verification &amp; Municipal Pickup Dispatch
           </h1>
           <p className="text-xs sm:text-sm text-slate-300">
-            Separate from public member accounts. Verify AI waste tags, filter duplicates, and route pickups to Puri Municipality, BMC, or Balasore squads.
+            Separate from public member accounts. Verify waste tags, filter duplicates, and route pickups to Puri Municipality, BMC, or Balasore squads.
           </p>
         </div>
 
@@ -189,7 +189,7 @@ export function ModeratorWorkspace({
                       {rep.title}
                     </h2>
                     <div className="text-xs text-[#52677A]">
-                      {rep.locationName} · Category: <strong className="text-[#0B253A]">{rep.category}</strong> (AI {rep.aiConfidence}%)
+                      {rep.locationName} · Category: <strong className="text-[#0B253A]">{rep.category}</strong>
                     </div>
                     <div className="pt-1 flex flex-wrap items-center gap-3">
                       <StatusInline status={rep.status} />

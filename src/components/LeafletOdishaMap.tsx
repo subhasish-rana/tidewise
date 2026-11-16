@@ -33,8 +33,18 @@ const ODISHA_COAST_REFERENCE: [number, number][] = [
   [21.62, 87.48], // Digha border
 ];
 
+// Leaflet builds marker DOM from an HTML string, so any dynamic text must be escaped.
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function createWaterBodyIcon(name: string, isSelected: boolean): L.DivIcon {
-  const shortName = name.split('(')[0].trim();
+  const shortName = escapeHtml(name.split('(')[0].trim());
   const ring = isSelected
     ? '<span style="position:absolute;inset:-6px;border-radius:9999px;background:rgba(2,132,199,0.22);border:1.5px solid #0284C7;"></span>'
     : '';

@@ -57,9 +57,6 @@ export interface WasteReport {
   mapX: number;
   mapY: number;
   category: WasteCategory;
-  aiSuggestedCategory: WasteCategory;
-  aiConfidence: number; // 0-100
-  aiReasoning: string;
   severity: SeverityLevel;
   status: ReportStatus;
   description: string;
@@ -157,15 +154,6 @@ export interface MemberAccount {
   verified: boolean;
   points: number;
   homeRegion: string;
-}
-
-export interface AiClassificationResult {
-  category: WasteCategory;
-  confidenceLabel: 'High confidence' | 'Moderate confidence' | 'Low confidence';
-  confidenceScore: number;
-  reasoning: string;
-  suggestedSeverity: SeverityLevel;
-  municipalUnitHint: string;
 }
 
 export type AppScreen =

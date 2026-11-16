@@ -117,7 +117,7 @@ export function WelcomeAuth({
             Spot it. Tag it. Help clean it.
           </h1>
           <p className="mt-3 text-base text-slate-200 leading-relaxed">
-            Report coastal and lake litter across Puri, Chandipur, and Bhubaneswar. Confirm AI waste detection, join local cleanups, and help route municipal pickups.
+            Report coastal and lake litter across Puri, Chandipur, and Bhubaneswar. Tag waste types, join local cleanups, and help route municipal pickups.
           </p>
         </div>
 

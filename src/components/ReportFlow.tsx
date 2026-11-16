@@ -7,11 +7,9 @@ import {
   Loader2,
   LocateFixed,
   MapPin,
-  Sparkles,
 } from 'lucide-react';
 import { IMAGES } from '../data/seedData';
 import type {
-  AiClassificationResult,
   MemberAccount,
   SeverityLevel,
   WasteCategory,
@@ -52,8 +50,6 @@ export function ReportFlow({
 }: ReportFlowProps) {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [photoPreview, setPhotoPreview] = useState<string>('');
-  const [photoBase64, setPhotoBase64] = useState<string>('');
-  const [photoMimeType, setPhotoMimeType] = useState<string>('image/jpeg');
   const [description, setDescription] = useState('');
   const [showMapPicker, setShowMapPicker] = useState(false);
 
@@ -70,10 +66,7 @@ export function ReportFlow({
   const [locLoading, setLocLoading] = useState(false);
   const [locNote, setLocNote] = useState('');
 
-  // Step 2 AI states
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiError, setAiError] = useState('');
-  const [aiResult, setAiResult] = useState<AiClassificationResult | null>(null);
+  // Step 2 states
   const [selectedCategory, setSelectedCategory] = useState<WasteCategory>('Plastic');
   const [selectedSeverity, setSelectedSeverity] = useState<SeverityLevel>('Medium');
 
@@ -87,20 +80,16 @@ export function ReportFlow({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setPhotoMimeType(file.type || 'image/jpeg');
     const reader = new FileReader();
     reader.onload = () => {
       const result = typeof reader.result === 'string' ? reader.result : '';
       setPhotoPreview(result);
-      setPhotoBase64(result);
     };
     reader.readAsDataURL(file);
   };
 
   const handleUseSamplePhoto = () => {
     setPhotoPreview(IMAGES.sampleHotspot);
-    setPhotoBase64('');
-    setPhotoMimeType('image/jpeg');
   };
 
   const handleUseCurrentLocation = () => {
@@ -170,40 +159,9 @@ export function ReportFlow({
     }
   };
 
-  const handleContinueToAi = async () => {
+  const handleContinueToDetails = () => {
     if (!photoPreview || !pickedLocation) return;
     setStep(2);
-    setAiLoading(true);
-    setAiError('');
-
-    try {
-      const resp = await fetch('/api/classify-waste', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageBase64: photoBase64 || undefined,
-          mimeType: photoMimeType,
-          imageUrl: photoBase64 ? undefined : photoPreview,
-          description,
-          locationName: pickedLocation.name,
-        }),
-      });
-      const data = (await resp.json()) as AiClassificationResult & { error?: string };
-      if (!resp.ok) {
-        throw new Error(data.error || 'AI classification unavailable.');
-      }
-      setAiResult(data);
-      setSelectedCategory(data.category);
-      setSelectedSeverity(data.suggestedSeverity);
-    } catch (err) {
-      setAiError(
-        err instanceof Error
-          ? `${err.message} You can still select the waste category manually below.`
-          : 'Could not reach AI classifier; select category manually.',
-      );
-    } finally {
-      setAiLoading(false);
-    }
   };
 
   const handleSubmitFinal = async () => {
@@ -224,9 +182,6 @@ export function ReportFlow({
           mapX: pickedLocation.mapX,
           mapY: pickedLocation.mapY,
           category: selectedCategory,
-          aiSuggestedCategory: aiResult?.category || selectedCategory,
-          aiConfidence: aiResult?.confidenceScore || 85,
-          aiReasoning: aiResult?.reasoning || 'Confirmed by reporter.',
           severity: selectedSeverity,
           description:
             description.trim() ||
@@ -262,7 +217,7 @@ export function ReportFlow({
           </div>
           <h1 className="font-display text-xl sm:text-2xl font-bold text-[#0B253A] mt-0.5">
             {step === 1 && 'Photo & geotag location'}
-            {step === 2 && 'AI waste review & confirmation'}
+            {step === 2 && 'Waste category & severity'}
             {step === 3 && 'Waste report submitted'}
           </h1>
         </div>
@@ -289,7 +244,7 @@ export function ReportFlow({
                   1. Capture or upload photo
                 </h2>
                 <p className="text-xs text-[#52677A]">
-                  Clear daylight photo helps AI classify waste type accurately
+                  Clear daylight photo helps coordinators confirm the waste type
                 </p>
               </div>
             </div>
@@ -315,7 +270,6 @@ export function ReportFlow({
                     type="button"
                     onClick={() => {
                       setPhotoPreview('');
-                      setPhotoBase64('');
                     }}
                     className="min-h-[40px] px-4 py-2 rounded-xl text-xs font-semibold text-[#B91C1C] hover:bg-red-50 cursor-pointer"
                   >
@@ -475,15 +429,15 @@ export function ReportFlow({
           <button
             type="button"
             disabled={!canContinue}
-            onClick={handleContinueToAi}
+            onClick={handleContinueToDetails}
             className="w-full min-h-[48px] px-6 py-3 rounded-xl bg-[#0D9488] hover:bg-[#0F766E] disabled:bg-[#0B253A]/20 disabled:cursor-not-allowed text-white font-semibold text-sm transition-colors cursor-pointer"
           >
-            {canContinue ? 'Continue to AI review' : 'Add a photo and location to continue'}
+            {canContinue ? 'Continue to waste details' : 'Add a photo and location to continue'}
           </button>
         </div>
       )}
 
-      {/* Step 2: AI Review & Confirmation */}
+      {/* Step 2: Waste details */}
       {step === 2 && (
         <div className="space-y-5">
           <button
@@ -503,39 +457,20 @@ export function ReportFlow({
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="sm:col-span-7 p-5 space-y-3">
-                <div className="flex items-center gap-2 text-xs font-semibold text-[#0284C7]">
-                  <Sparkles className="w-4 h-4" />
-                  <span>AI suggestion — please confirm</span>
-                </div>
-
-                {aiLoading ? (
-                  <div className="py-6 flex items-center gap-3 text-sm text-[#52677A]">
-                    <Loader2 className="w-5 h-5 animate-spin text-[#0D9488]" />
-                    <span>Analyzing waste materials with Gemini vision…</span>
-                  </div>
-                ) : aiError ? (
-                  <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
-                    {aiError}
-                  </div>
-                ) : aiResult ? (
-                  <div className="space-y-2">
-                    <div className="flex items-baseline justify-between gap-2">
-                      <span className="font-display text-lg font-bold text-[#0B253A]">
-                        Suggested: {aiResult.category} waste
-                      </span>
-                      <span className="font-mono-tabular text-xs font-semibold text-[#0D9488]">
-                        {aiResult.confidenceLabel} ({aiResult.confidenceScore}%)
-                      </span>
-                    </div>
-                    <p className="text-xs text-[#52677A] leading-relaxed">
-                      {aiResult.reasoning}
-                    </p>
-                    <p className="text-xs text-[#0B253A] font-medium pt-1">
-                      Suggested municipal unit: {aiResult.municipalUnitHint}
-                    </p>
-                  </div>
-                ) : null}
+              <div className="sm:col-span-7 p-5 space-y-2">
+                <div className="text-xs font-semibold text-[#0284C7]">Report summary</div>
+                <p className="font-display text-lg font-bold text-[#0B253A]">
+                  {pickedLocation?.name || 'Hotspot location'}
+                </p>
+                {pickedLocation && (
+                  <p className="font-mono-tabular text-xs text-[#52677A]">
+                    {pickedLocation.lat.toFixed(4)}° N, {pickedLocation.lng.toFixed(4)}° E ·{' '}
+                    {pickedLocation.region}
+                  </p>
+                )}
+                {description && (
+                  <p className="text-xs text-[#52677A] leading-relaxed">{description}</p>
+                )}
               </div>
             </div>
           </div>
@@ -544,10 +479,10 @@ export function ReportFlow({
           <div className="bg-white rounded-2xl border border-[#0B253A]/10 p-5 space-y-4">
             <div>
               <h2 className="font-display text-base font-bold text-[#0B253A]">
-                Confirm waste category
+                Select waste category
               </h2>
               <p className="text-xs text-[#52677A]">
-                Tap to adjust if the AI suggestion missed the primary material
+                Pick the dominant material visible in the photo
               </p>
             </div>
 
@@ -605,7 +540,7 @@ export function ReportFlow({
 
           <button
             type="button"
-            disabled={aiLoading || submitting}
+            disabled={submitting}
             onClick={handleSubmitFinal}
             className="w-full min-h-[48px] px-6 py-3 rounded-xl bg-[#0D9488] hover:bg-[#0F766E] disabled:opacity-60 text-white font-semibold text-sm inline-flex items-center justify-center gap-2 cursor-pointer"
           >
